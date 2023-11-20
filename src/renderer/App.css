@@ -1,0 +1,68 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+@font-face {
+  font-family: 'Inter';
+  src: url('../../assets/fonts/Inter.ttf');
+}
+
+body {
+  color-scheme: dark;
+  position: relative;
+  color: white;
+  height: 100vh;
+  margin: 0;
+  background: #2c2c2c;
+  overflow-y: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Inter;
+}
+
+.frameset {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+}
+.leftnav {
+  flex: 0 1 200px;
+  height: 100%;
+  max-width: 200px;
+  overflow-y: auto;
+}
+.appframe {
+  flex: 1 0;
+  height: 100%;
+  padding: 0;
+}
+iframe {
+  border: none;
+}
+
+
+.file-selector {
+  font-size: 15px;
+  user-select: none;
+}
+
+.file-selector .file-item {
+  padding: 4px 8px;
+  border-bottom: 1px solid #eee3;
+}
+
+.file-selector .file-item img {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.file-selector .file-item:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.dateinfo {
+  text-transform: uppercase;
+  font-size: 10px;
+}
