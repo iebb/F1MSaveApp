@@ -14,6 +14,13 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import './ipc';
 
+import { autoUpdater } from 'electron-updater';
+
+class AppUpdater {
+  constructor() {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+}
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -93,6 +100,10 @@ const createWindow = async () => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
+
+  // Remove this if your app does not use auto updates
+  // eslint-disable-next-line
+  new AppUpdater();
 
 };
 

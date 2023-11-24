@@ -66,3 +66,9 @@ iframe {
   text-transform: uppercase;
   font-size: 10px;
 }
+
+.reload {
+  text-transform: uppercase;
+  font-size: 13px;
+  padding: 4px 0;
+}

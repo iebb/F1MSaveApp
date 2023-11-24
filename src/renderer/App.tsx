@@ -43,11 +43,22 @@ function Hello() {
 
 
   }, [])
+
   // @ts-ignore
   return (
     <div className="frameset">
       <div className="leftnav">
         <div className="file-selector">
+          <div
+            className="file-item"
+            onClick={() => {
+              window.electron.ipcRenderer.sendMessage('loaded', ['load']);
+            }}
+          >
+            <div className="reload">
+              reload filelist
+            </div>
+          </div>
           {
             fileList.map(f => (
               <div
