@@ -1,7 +1,7 @@
 {
-  "name": "f1m-dbviewer-app",
-  "version": "0.8.0",
-  "description": "The Desktop App for F1 Manager DB Viewer",
+  "name": "f1-manager-save-viewer",
+  "version": "0.8.1",
+  "description": "The Desktop App for F1 Manager Save Viewer",
   "license": "MIT",
   "author": {
     "name": "ieb",
