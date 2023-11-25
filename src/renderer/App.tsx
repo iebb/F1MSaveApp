@@ -15,7 +15,7 @@ const logoMapping: any = {
 }
 
 
-function Hello() {
+function MainApp() {
   let ref = useRef<HTMLIFrameElement>(null);
   let [fileList, setFileList] = useState<SaveFile[]>([]);
   useEffect(() => {
@@ -98,7 +98,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<MainApp />} />
       </Routes>
     </Router>
   );

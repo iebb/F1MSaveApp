@@ -75,6 +75,8 @@ const createWindow = async () => {
     },
   });
 
+  mainWindow.webContents.userAgent = "ee.nekoko.F1MSaveApp";
+
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
