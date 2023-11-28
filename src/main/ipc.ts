@@ -2,6 +2,7 @@
 
 import { ipcMain } from 'electron';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import glob from 'glob';
 import { SaveFile } from '../types/types';
@@ -135,44 +136,39 @@ const listFiles = () => {
 };
 const listFilesLinux = () => {
   const fileList: SaveFile[] = [];
-  const compat23 =
-    '~/.local/share/Steam/steamapps/compatdata/1708520/pfx/drive_c/users/steamuser/AppData/Local';
-  const compat22 =
-    '~/.local/share/Steam/steamapps/compatdata/2287220/pfx/drive_c/users/steamuser/AppData/Local';
+  const steamAppData = `${os.homedir()}/.local/share/Steam/steamapps/compatdata`;
+  const compat23 = `${steamAppData}/1708520/pfx/drive_c/users/steamuser/AppData/Local/F1Manager22`;
+  const compat22 = `${steamAppData}/2287220/pfx/drive_c/users/steamuser/AppData/Local/F1Manager23`;
 
-  glob
-    .sync(`${compat23}/F1Manager23/Saved/SaveGames/*.sav`)
-    .forEach((file: string) => {
-      const fst = fs.statSync(file);
-      const basename = path.basename(file);
-      if (/^save\d+\.sav$/.test(basename) || basename === 'autosave.sav') {
-        fileList.push({
-          file,
-          filename: basename,
-          size: fst.size,
-          mtime: fst.mtimeMs,
-          version: 3,
-          platform: 'Steam',
-        });
-      }
-    });
+  glob.sync(`${compat23}/Saved/SaveGames/*.sav`).forEach((file: string) => {
+    const fst = fs.statSync(file);
+    const basename = path.basename(file);
+    if (/^save\d+\.sav$/.test(basename) || basename === 'autosave.sav') {
+      fileList.push({
+        file,
+        filename: basename,
+        size: fst.size,
+        mtime: fst.mtimeMs,
+        version: 3,
+        platform: 'Steam',
+      });
+    }
+  });
 
-  glob
-    .sync(`${compat22}/F1Manager22/Saved/SaveGames/*.sav`)
-    .forEach((file: string) => {
-      const fst = fs.statSync(file);
-      const basename = path.basename(file);
-      if (/^save\d+\.sav$/.test(basename) || basename === 'autosave.sav') {
-        fileList.push({
-          file,
-          filename: basename,
-          size: fst.size,
-          mtime: fst.mtimeMs,
-          version: 2,
-          platform: 'Steam',
-        });
-      }
-    });
+  glob.sync(`${compat22}/Saved/SaveGames/*.sav`).forEach((file: string) => {
+    const fst = fs.statSync(file);
+    const basename = path.basename(file);
+    if (/^save\d+\.sav$/.test(basename) || basename === 'autosave.sav') {
+      fileList.push({
+        file,
+        filename: basename,
+        size: fst.size,
+        mtime: fst.mtimeMs,
+        version: 2,
+        platform: 'Steam',
+      });
+    }
+  });
   return fileList.sort((x: SaveFile, y: SaveFile) => y.mtime - x.mtime);
 };
 
