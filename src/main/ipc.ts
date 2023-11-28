@@ -137,8 +137,8 @@ const listFiles = () => {
 const listFilesLinux = () => {
   const fileList: SaveFile[] = [];
   const steamAppData = `${os.homedir()}/.local/share/Steam/steamapps/compatdata`;
-  const compat23 = `${steamAppData}/1708520/pfx/drive_c/users/steamuser/AppData/Local/F1Manager22`;
-  const compat22 = `${steamAppData}/2287220/pfx/drive_c/users/steamuser/AppData/Local/F1Manager23`;
+  const compat22 = `${steamAppData}/1708520/pfx/drive_c/users/steamuser/AppData/Local/F1Manager22`;
+  const compat23 = `${steamAppData}/2287220/pfx/drive_c/users/steamuser/AppData/Local/F1Manager23`;
 
   glob.sync(`${compat23}/Saved/SaveGames/*.sav`).forEach((file: string) => {
     const fst = fs.statSync(file);

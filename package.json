@@ -176,6 +176,12 @@
         "nsis"
       ]
     },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utilities"
+    },
     "directories": {
       "app": "release/app",
       "buildResources": "assets",

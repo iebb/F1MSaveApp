@@ -75,7 +75,10 @@ const createWindow = async () => {
     },
   });
 
-  mainWindow.webContents.userAgent = "ee.nekoko.F1MSaveApp";
+  mainWindow.webContents.userAgent = `${mainWindow.webContents.userAgent.replaceAll(
+    ' Electron',
+    'MRCHROME',
+  )} ee.nekoko.F1MSaveApp`;
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
@@ -106,7 +109,6 @@ const createWindow = async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
-
 };
 
 /**
@@ -120,7 +122,7 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-app.commandLine.appendSwitch('disable-site-isolation-trials')
+app.commandLine.appendSwitch('disable-site-isolation-trials');
 app
   .whenReady()
   .then(() => {
