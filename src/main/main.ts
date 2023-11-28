@@ -1,6 +1,7 @@
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 
 import { app, BrowserWindow, shell } from 'electron';
+import { autoUpdater } from 'electron-updater';
 /**
  * This module executes inside of electron's main process. You can start
  * electron renderer process from here and communicate with the other processes
@@ -13,8 +14,6 @@ import path from 'path';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import './ipc';
-
-import { autoUpdater } from 'electron-updater';
 
 class AppUpdater {
   constructor() {
@@ -75,10 +74,14 @@ const createWindow = async () => {
     },
   });
 
-  mainWindow.webContents.userAgent = `${mainWindow.webContents.userAgent.replaceAll(
-    ' Electron',
-    'MRCHROME',
-  )} ee.nekoko.F1MSaveApp`;
+  mainWindow.webContents.userAgent = `${mainWindow.webContents.userAgent
+    .replaceAll(' Electron', 'MRCHROME')
+    .replaceAll(
+      'Chrome/',
+      `Chrome/${app.getVersion()}.`,
+    )} ee.nekoko.F1MSaveApp`;
+
+  console.log(mainWindow.webContents.userAgent);
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
