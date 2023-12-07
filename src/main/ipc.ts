@@ -69,26 +69,33 @@ const listXboxFiles = (xboxPath: string) => {
             `\\${swappedPath}\\container.${containerVersion}`,
           ),
         );
+
+        const headerPos = 8;
+
         const swappedContainerPath = swapXboxString(
-          container.slice(128 + 8, 128 + 8 + 16),
+          container.slice(headerPos + 128 + 16, headerPos + 128 + 16 + 16),
         );
+        try {
+          const fileHash = file.replaceAll(
+            'containers.index',
+            `\\${swappedPath}\\${swappedContainerPath}`,
+          );
+          const fst = fs.statSync(fileHash);
 
-        const fileHash = file.replaceAll(
-          'containers.index',
-          `\\${swappedPath}\\${swappedContainerPath}`,
-        );
-        const fst = fs.statSync(fileHash);
+          if (/^save\d+$/.test(filename) || filename === 'autosave') {
+            fileList.push({
+              file: fileHash,
+              filename,
+              size: fst.size,
+              mtime: fst.mtimeMs,
+              version: 3,
+              platform: 'Xbox',
+            });
+          }
+        } catch {
 
-        if (/^save\d+$/.test(filename) || filename === 'autosave') {
-          fileList.push({
-            file: fileHash,
-            filename,
-            size: fst.size,
-            mtime: fst.mtimeMs,
-            version: 3,
-            platform: 'Xbox',
-          });
         }
+
       }
     });
   return fileList;
