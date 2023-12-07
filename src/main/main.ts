@@ -89,6 +89,15 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+    if (process.env.BACKEND && process.env.BACKEND.toLowerCase() !== 'remote') {
+      mainWindow.webContents.send(
+        'connect-to',
+        process.env.BACKEND.toLowerCase() === 'local'
+          ? 'http://localhost:3000'
+          : process.env.BACKEND,
+      );
+    }
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {

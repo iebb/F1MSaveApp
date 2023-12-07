@@ -41,6 +41,9 @@ function MainApp() {
       }))
     });
 
+    window.electron.ipcRenderer.on('connect-to', (url: any) => {
+      ref.current?.setAttribute('src', url.toString());
+    });
 
   }, [])
 
