@@ -46,21 +46,25 @@ const listXboxFiles = (xboxPath: string) => {
         const containerStrings1 = new TextDecoder('UTF-16').decode(
           f.slice(0, stringLength1 * 2),
         );
-        f = f.slice(stringLength1 * 2); // timestamp
-
+        f = f.slice(stringLength1 * 2);
         const stringLength2 = f.readInt32LE();
         f = f.slice(4);
         // let containerStrings2 = new TextDecoder("UTF-16").decode(f.slice(0, stringLength2 * 2));
-        f = f.slice(stringLength2 * 2); // timestamp
+        f = f.slice(stringLength2 * 2);
         const stringLength3 = f.readInt32LE();
         f = f.slice(4);
         // let containerStrings3 = new TextDecoder("UTF-16").decode(f.slice(0, stringLength3 * 2));
-        f = f.slice(stringLength3 * 2); // timestamp
+        f = f.slice(stringLength3 * 2);
         const filename = containerStrings1;
         const containerVersion = f.readInt8();
         f = f.slice(1 + 4); // containerUnknown1
         const filePath = f.slice(0, 16);
-        f = f.slice(16 + 8 + 8 + 8); //
+        f = f.slice(16); //
+
+        const timestamp = f.readBigInt64LE();
+        f = f.slice(8); //
+
+        f = f.slice(8 + 8); //
         const swappedPath = swapXboxString(filePath);
 
         const container = fs.readFileSync(
@@ -83,11 +87,12 @@ const listXboxFiles = (xboxPath: string) => {
           const fst = fs.statSync(fileHash);
 
           if (/^save\d+$/.test(filename) || filename === 'autosave') {
+            const unixTimestamp = Number(timestamp / 10000n) - 11644473600000
             fileList.push({
               file: fileHash,
               filename,
               size: fst.size,
-              mtime: fst.mtimeMs,
+              mtime: unixTimestamp,
               version: 3,
               platform: 'Xbox',
             });
