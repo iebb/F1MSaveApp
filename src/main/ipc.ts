@@ -56,7 +56,7 @@ const listXboxFiles = (xboxPath: string) => {
         // let containerStrings3 = new TextDecoder("UTF-16").decode(f.slice(0, stringLength3 * 2));
         f = f.slice(stringLength3 * 2);
         const filename = containerStrings1;
-        const containerVersion = f.readInt8();
+        const containerVersion = f.readUInt8();
         f = f.slice(1 + 4); // containerUnknown1
         const filePath = f.slice(0, 16);
         f = f.slice(16); //
@@ -67,19 +67,19 @@ const listXboxFiles = (xboxPath: string) => {
         f = f.slice(8 + 8); //
         const swappedPath = swapXboxString(filePath);
 
-        const container = fs.readFileSync(
-          file.replaceAll(
-            'containers.index',
-            `\\${swappedPath}\\container.${containerVersion}`,
-          ),
-        );
-
-        const headerPos = 8;
-
-        const swappedContainerPath = swapXboxString(
-          container.slice(headerPos + 128 + 16, headerPos + 128 + 16 + 16),
-        );
         try {
+          const container = fs.readFileSync(
+            file.replaceAll(
+              'containers.index',
+              `\\${swappedPath}\\container.${containerVersion}`,
+            ),
+          );
+
+          const headerPos = 8;
+
+          const swappedContainerPath = swapXboxString(
+            container.slice(headerPos + 128 + 16, headerPos + 128 + 16 + 16),
+          );
           const fileHash = file.replaceAll(
             'containers.index',
             `\\${swappedPath}\\${swappedContainerPath}`,
@@ -97,8 +97,8 @@ const listXboxFiles = (xboxPath: string) => {
               platform: 'Xbox',
             });
           }
-        } catch {
-
+        } catch (e) {
+          console.error(e);
         }
 
       }
