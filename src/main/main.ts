@@ -81,21 +81,19 @@ const createWindow = async () => {
       `Chrome/${app.getVersion()}.`,
     )} ee.nekoko.F1MSaveApp`;
 
-  console.log(mainWindow.webContents.userAgent);
+  let backend = "https://save.f1setup.it";
 
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
+  if (process.env.BACKEND && process.env.BACKEND.toLowerCase() !== 'remote') {
+    backend = process.env.BACKEND.toLowerCase() === 'local'
+      ? 'http://localhost:3000'
+      : process.env.BACKEND
+  }
+
+  mainWindow.loadURL(resolveHtmlPath('index.html') + '?backend=' + backend);
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
-    }
-    if (process.env.BACKEND && process.env.BACKEND.toLowerCase() !== 'remote') {
-      mainWindow.webContents.send(
-        'connect-to',
-        process.env.BACKEND.toLowerCase() === 'local'
-          ? 'http://localhost:3000'
-          : process.env.BACKEND,
-      );
     }
 
     if (process.env.START_MINIMIZED) {

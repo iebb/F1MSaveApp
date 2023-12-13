@@ -42,6 +42,11 @@ export default class MenuBuilder {
   }
 
   buildDefaultTemplate() {
+
+    const localInstance = process.env.BACKEND?.toLowerCase() === 'local'
+      ? 'http://localhost:3000'
+      : process.env.BACKEND;
+
     return [
       {
         label: '&File',
@@ -94,6 +99,16 @@ export default class MenuBuilder {
                 accelerator: 'Alt+Ctrl+I',
                 click: () => {
                   this.mainWindow.webContents.toggleDevTools();
+                },
+              },
+              {
+                label: 'Connect to &Local Instance',
+                accelerator: 'Alt+Ctrl+L',
+                click: () => {
+                  this.mainWindow.webContents.send(
+                    'connect-to',
+                    localInstance,
+                  );
                 },
               },
             ]

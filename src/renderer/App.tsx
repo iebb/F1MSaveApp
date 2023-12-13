@@ -18,6 +18,10 @@ const logoMapping: any = {
 function MainApp() {
   let ref = useRef<HTMLIFrameElement>(null);
   let [fileList, setFileList] = useState<SaveFile[]>([]);
+
+  const remoteURL = new URLSearchParams(document.location.search).get("backend") || "https://save.f1setup.it/"
+  let [remote, setRemote] = useState(remoteURL);
+
   useEffect(() => {
     window.electron.ipcRenderer.sendMessage('loaded', ['load']); // request file
     window.electron.ipcRenderer.on('file-list', (arg: any) => {
@@ -42,7 +46,7 @@ function MainApp() {
     });
 
     window.electron.ipcRenderer.on('connect-to', (url: any) => {
-      ref.current?.setAttribute('src', url.toString());
+      setRemote(url.toString());
     });
 
   }, [])
@@ -88,7 +92,8 @@ function MainApp() {
       </div>
       <div className="appframe">
         <iframe
-          src='https://save.f1setup.it'
+          key={remote}
+          src={remote}
           ref={ref}
           style={{ height: "100%", width: "100%" }}
         ></iframe>
