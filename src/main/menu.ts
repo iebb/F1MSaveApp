@@ -43,9 +43,7 @@ export default class MenuBuilder {
 
   buildDefaultTemplate() {
 
-    const localInstance = process.env.BACKEND?.toLowerCase() === 'local'
-      ? 'http://localhost:3000'
-      : process.env.BACKEND;
+    const localInstance = process.env.BACKEND?.startsWith("http") ? process.env.BACKEND : 'http://localhost:3000';
 
     return [
       {

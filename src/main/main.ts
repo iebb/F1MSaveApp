@@ -83,10 +83,8 @@ const createWindow = async () => {
 
   let backend = "https://save.f1setup.it";
 
-  if (process.env.BACKEND && process.env.BACKEND.toLowerCase() !== 'remote') {
-    backend = process.env.BACKEND.toLowerCase() === 'local'
-      ? 'http://localhost:3000'
-      : process.env.BACKEND
+  if (process.env.BACKEND) {
+    backend = process.env.BACKEND.startsWith("http") ? process.env.BACKEND : 'http://localhost:3000'
   }
 
   mainWindow.loadURL(resolveHtmlPath('index.html') + '?backend=' + backend);
