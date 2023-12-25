@@ -6,6 +6,7 @@ import Steam from '../../assets/logos/steam.svg';
 import Xbox from '../../assets/logos/xbox.svg';
 import './App.css';
 import { SaveFile } from '../types/types';
+import { TeamLogos, WeekendStagesAbbrev } from './constants';
 
 const logoMapping: any = {
   3: logo_23,
@@ -67,26 +68,42 @@ function MainApp() {
             </div>
           </div>
           {
-            fileList.map(f => (
-              <div
-                className="file-item"
-                key={f.file}
-                onClick={() => {
-                  window.electron.ipcRenderer.sendMessage('request-file', f.file); // request file
-                }}
-              >
-                <div>
-                  <img width="18" alt="platform" src={logoMapping[f.platform]} />
-                  <img width="18" alt="icon" src={logoMapping[f.version]} />
-                  {f.filename}
-                </div>
-                <div className="dateinfo">
-                  {
-                    (new Date(f.mtime)).toLocaleTimeString("en-US", { month: 'short', day: 'numeric' })
-                  }
-                </div>
-              </div>
-            ))
+            fileList.map(f => {
+              const meta = f.careerSaveMetadata!;
+              return (
+                (
+                  <div
+                    className={`file-item ${meta.RaceWeekendInProgress ? 'race-week' : ''}`}
+                    key={f.file}
+                    onClick={() => {
+                      window.electron.ipcRenderer.sendMessage('request-file', f.file); // request file
+                    }}
+                  >
+                    <div>
+                      <img width='18' alt='icon' src={logoMapping[f.version]} style={{ marginRight: 10 }} />
+                      {f.filename}
+                      <div style={{ float: 'right', marginRight: -8, display: 'flex', flexDirection: 'row' }}>
+                        <img width='18' alt='platform' src={logoMapping[f.platform]} />
+                      </div>
+                    </div>
+                    <div className='team-logo-flex'>
+                      <img width='24' alt='platform' src={TeamLogos[meta.TeamID]} />
+                      <div className='team-logo-flex-date dateinfo'>
+                        <span className={`${meta.RaceWeekendInProgress ? 'race-week-text' : ''}`}>{
+                          (new Date(
+                            (meta.Day - 2) * 86400000 - 2208988800000
+                          )).toLocaleDateString('en-ZA', { dateStyle: 'short' }).substring(2)
+                        }, {meta.RaceWeekendInProgress ? `${meta.WeekendStage ? WeekendStagesAbbrev[meta.WeekendStage!] : 'Weekend'}` : meta.CurrentRace ? `Round ${meta.CurrentRace}` : 'End of Season'}</span>
+                        <br />
+                        {
+                          (new Date(f.mtime)).toLocaleTimeString('en-US', { month: 'short', day: 'numeric' })
+                        }
+                      </div>
+                    </div>
+                  </div>
+                )
+              )
+            })
           }
         </div>
       </div>

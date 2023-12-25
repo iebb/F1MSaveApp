@@ -2,10 +2,25 @@
 
 import { ipcMain } from 'electron';
 import fs from 'fs';
+import glob from 'glob';
 import os from 'os';
 import path from 'path';
-import glob from 'glob';
 import { SaveFile } from '../types/types';
+import { Gvas, Serializer, Tuple } from '../UESaveTool';
+
+
+export const parseGvasProps = (Properties: Tuple) => {
+  const careerSaveMetadata: any = {};
+  const metadataProperty = Properties.Properties.filter((x: any) => x.Name === "MetaData")[0];
+  const careerSaveMetadataProperty = metadataProperty.Properties[0];
+
+  careerSaveMetadataProperty.Properties.forEach((prop: any) => {
+    careerSaveMetadata[prop.Name] = prop.Property || prop.Properties;
+  })
+
+  return { careerSaveMetadata };
+}
+
 
 const swapXboxString = (s: Uint8Array) => {
   [s[0], s[3]] = [s[3], s[0]];
@@ -144,7 +159,13 @@ const listFiles = () => {
         });
       }
     });
-  return fileList.sort((x: SaveFile, y: SaveFile) => y.mtime - x.mtime);
+  return fileList.map(f => {
+    let reader = fs.readFileSync(f.file);
+    const serial = new Serializer(reader);
+    const gvasMeta = new Gvas().deserialize(serial);
+    const meta = parseGvasProps(gvasMeta.Properties);
+    return {...f, ...meta}
+  }).sort((x: SaveFile, y: SaveFile) => y.mtime - x.mtime);
 };
 const listFilesLinux = () => {
   const fileList: SaveFile[] = [];

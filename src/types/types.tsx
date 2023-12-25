@@ -6,4 +6,17 @@ export interface SaveFile {
   mtime: number;
   version: number;
   size: number;
+  careerSaveMetadata?: Metadata;
+}
+
+export interface Metadata {
+  Day: number;
+  TeamID: number;
+  Team: string;
+  FirstName: string;
+  LastName: string;
+
+  WeekendStage?: number;
+  CurrentRace?: number;
+  RaceWeekendInProgress?: boolean;
 }

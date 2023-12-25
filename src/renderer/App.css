@@ -28,9 +28,9 @@ body {
   margin: 0;
 }
 .leftnav {
-  flex: 0 1 200px;
+  flex: 0 1 220px;
   height: 100%;
-  max-width: 200px;
+  max-width: 220px;
   overflow-y: auto;
 }
 .appframe {
@@ -63,12 +63,30 @@ iframe {
 }
 
 .dateinfo {
-  text-transform: uppercase;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .reload {
   text-transform: uppercase;
   font-size: 13px;
   padding: 4px 0;
+}
+
+.team-logo-flex {
+  display: flex;
+  flex-direction: row;
+}
+
+.team-logo-flex-date {
+  margin-top: 4px;
+  line-height: 1.4em;
+}
+
+
+.race-week {
+  background: repeating-linear-gradient(135deg, #2c2c2c 0px, #323232 0px, #323232 6px, #2c2c2c 6px, #2c2c2c 12px);
+}
+
+.race-week-text {
+  color: #ffcccc;
 }
