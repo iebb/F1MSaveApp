@@ -1,6 +1,6 @@
-import {SerializationError} from "../PropertyErrors";
-import {Serializer} from '../Serializer';
-import {Property} from './'
+import { SerializationError } from '../PropertyErrors';
+import { Serializer } from '../Serializer';
+import { Property } from './';
 
 export class StrProperty extends Property {
     constructor() {
@@ -31,9 +31,11 @@ export class StrProperty extends Property {
         serial.seek(5);
         switch (this.Encoding) {
             case "utf8":
+                serial.writeInt32(this.StringEncodedLength);
                 serial.writeUTF8String(this.Property);
                 break;
             case "utf16le":
+                serial.writeInt32(-(this.StringEncodedLength / 2));
                 serial.writeUTF16String(this.Property);
                 break;
         }
