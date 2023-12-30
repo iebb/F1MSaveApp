@@ -83,80 +83,37 @@ const listXboxFiles = (xboxPath: string) => {
         const swappedPath = swapXboxString(filePath);
 
         try {
-          const container = fs.readFileSync(
-            file.replaceAll(
-              'containers.index',
-              `\\${swappedPath}\\container.${containerVersion}`,
-            ),
-          );
-
-          const headerPos = 8;
-
-          const swappedContainerPath = swapXboxString(
-            container.slice(headerPos + 128 + 16, headerPos + 128 + 16 + 16),
-          );
-          const fileHash = file.replaceAll(
+          const fileLocation =  file.replaceAll(
             'containers.index',
-            `\\${swappedPath}\\${swappedContainerPath}`,
+            `\\${swappedPath}\\container.${containerVersion}`,
           );
-          const fst = fs.statSync(fileHash);
-
-          if (/^save\d+$/.test(filename) || filename === 'autosave') {
-            const unixTimestamp = Number(timestamp / 10000n) - 11644473600000
-            fileList.push({
-              file: fileHash,
-              filename,
-              size: fst.size,
-              mtime: unixTimestamp,
-              version: 3,
-              platform: 'Xbox',
-            });
+          if (fs.existsSync(fileLocation)) {
+            const container = fs.readFileSync(fileLocation);
+            const headerPos = 8;
+            const swappedContainerPath = swapXboxString(
+              container.slice(headerPos + 128 + 16, headerPos + 128 + 16 + 16),
+            );
+            const fileHash = file.replaceAll(
+              'containers.index',
+              `\\${swappedPath}\\${swappedContainerPath}`,
+            );
+            const fst = fs.statSync(fileHash);
+            if (/^save\d+$/.test(filename) || filename === 'autosave') {
+              const unixTimestamp = Number(timestamp / 10000n) - 11644473600000
+              fileList.push({
+                file: fileHash,
+                filename,
+                size: fst.size,
+                mtime: unixTimestamp,
+                version: 3,
+                platform: 'Xbox',
+              });
+            }
           }
         } catch (e) {
           console.error(e);
         }
 
-      }
-    });
-  return fileList;
-};
-
-const listFiles = () => {
-  const fileList: SaveFile[] = listXboxFiles(
-    'FrontierDevelopmentsPlc.21035A543665E_ft442cafaz8hg',
-  );
-
-  glob
-    .sync(`${process.env.LOCALAPPDATA}\\F1Manager23\\Saved\\SaveGames\\*.sav`)
-    .forEach((file: string) => {
-      const fst = fs.statSync(file);
-      const basename = path.basename(file);
-      if (/^save\d+\.sav$/.test(basename) || basename === 'autosave.sav') {
-        fileList.push({
-          file,
-          filename: basename,
-          size: fst.size,
-          mtime: fst.mtimeMs,
-          version: 3,
-          platform: 'Steam',
-        });
-      }
-    });
-
-  glob
-    .sync(`${process.env.LOCALAPPDATA}\\F1Manager22\\Saved\\SaveGames\\*.sav`)
-    .forEach((file: string) => {
-      const fst = fs.statSync(file);
-      const basename = path.basename(file);
-      if (/^save\d+\.sav$/.test(basename) || basename === 'autosave.sav') {
-        fileList.push({
-          file,
-          filename: basename,
-          size: fst.size,
-          mtime: fst.mtimeMs,
-          version: 2,
-          platform: 'Steam',
-        });
       }
     });
   return fileList;
@@ -198,22 +155,66 @@ const listFilesLinux = () => {
   });
   return fileList;
 };
+const listFilesWindows = () => {
+  const fileList: SaveFile[] = listXboxFiles(
+    'FrontierDevelopmentsPlc.21035A543665E_ft442cafaz8hg',
+  );
 
-ipcMain.on('loaded', async (event) => {
+  glob
+    .sync(`${process.env.LOCALAPPDATA}\\F1Manager23\\Saved\\SaveGames\\*.sav`)
+    .forEach((file: string) => {
+      const fst = fs.statSync(file);
+      const basename = path.basename(file);
+      if (/^save\d+\.sav$/.test(basename) || basename === 'autosave.sav') {
+        fileList.push({
+          file,
+          filename: basename,
+          size: fst.size,
+          mtime: fst.mtimeMs,
+          version: 3,
+          platform: 'Steam',
+        });
+      }
+    });
+
+  glob
+    .sync(`${process.env.LOCALAPPDATA}\\F1Manager22\\Saved\\SaveGames\\*.sav`)
+    .forEach((file: string) => {
+      const fst = fs.statSync(file);
+      const basename = path.basename(file);
+      if (/^save\d+\.sav$/.test(basename) || basename === 'autosave.sav') {
+        fileList.push({
+          file,
+          filename: basename,
+          size: fst.size,
+          mtime: fst.mtimeMs,
+          version: 2,
+          platform: 'Steam',
+        });
+      }
+    });
+  return fileList;
+};
+
+const listFiles = () => {
   let files = [];
   if (process.platform === 'win32') {
-    files = listFiles();
+    files = listFilesWindows();
   } else if (process.platform === 'linux') {
     files = listFilesLinux();
   }
-  files = files.map(f => {
+
+  return files.map(f => {
     let reader = fs.readFileSync(f.file);
     const serial = new Serializer(reader);
     const gvasMeta = new Gvas().deserialize(serial);
     const meta = parseGvasProps(gvasMeta.Properties);
     return {...f, ...meta}
-  }).sort((x: SaveFile, y: SaveFile) => y.mtime - x.mtime)
-  event.reply('file-list', files);
+  }).sort((x: SaveFile, y: SaveFile) => y.mtime - x.mtime);
+
+};
+ipcMain.on('loaded', async (event) => {
+  event.reply('file-list', listFiles());
 });
 
 ipcMain.on('request-file', async (event, filename) => {
@@ -234,20 +235,18 @@ ipcMain.on('save-file', async (event, { data, path: filename }) => {
   }
   fs.writeFileSync(filename, data);
   event.reply('file-list', listFiles());
-  console.log("reading file", filename);
-  fs.readFile(filename, (err, buffer) => {
-    event.reply('open-file', {
-      file: buffer,
-      filename: path.basename(filename),
-      path: filename,
-      haveBackup: fs.existsSync(`${filename}.bak`),
-    });
-  });
+  // fs.readFile(filename, (err, buffer) => {
+  //   event.reply('open-file', {
+  //     file: buffer,
+  //     filename: path.basename(filename),
+  //     path: filename,
+  //     haveBackup: fs.existsSync(`${filename}.bak`),
+  //   });
+  // });
 });
 
 ipcMain.on('load-backup-file', async (event, { data, path: filename }) => {
   if (fs.existsSync(`${filename}.bak`)) {
-    console.log("load-backup-file");
     fs.renameSync(`${filename}.bak`, filename);
 
     fs.readFile(filename, (err, buffer) => {
