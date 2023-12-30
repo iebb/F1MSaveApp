@@ -1,12 +1,17 @@
-import { SerializationError } from '../PropertyErrors';
-import { Serializer } from '../Serializer';
-import { Property } from './';
+import {SerializationError} from "../PropertyErrors";
+import {Serializer} from '../Serializer';
+import {Property} from './'
+
+const is8Bit = string => /^[\x00-\xFF]*$/.test(string);
 
 export class StrProperty extends Property {
     constructor() {
         super();
         this.Property = "";
-        this.Encoding = "utf8";
+    }
+
+    get Encoding() {
+        return is8Bit(this.Property) ? "latin1" : "utf16le";
     }
 
     get StringEncodedLength() {
@@ -19,7 +24,7 @@ export class StrProperty extends Property {
     }
     deserialize(serial) {
         serial.seek(5);
-        [this.Property, this.Encoding] = serial.readUnicodeString();
+        [this.Property, ] = serial.readUnicodeString();
         return this;
     }
     serialize() {
@@ -30,9 +35,9 @@ export class StrProperty extends Property {
         serial.writeInt32(this.StringEncodedLength + 4);
         serial.seek(5);
         switch (this.Encoding) {
-            case "utf8":
+            case "latin1":
                 serial.writeInt32(this.StringEncodedLength);
-                serial.writeUTF8String(this.Property);
+                serial.writeLatin1String(this.Property);
                 break;
             case "utf16le":
                 serial.writeInt32(-(this.StringEncodedLength / 2));

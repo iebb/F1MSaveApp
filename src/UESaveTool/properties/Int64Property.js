@@ -33,6 +33,23 @@ export class Int64Property extends Property {
     }
     static from(obj) {
         let prop = new Int64Property();
+        let bi = 0n;
+        try {
+            bi = BigInt(obj.Property || 0);
+            const lb = -1n << 64n;
+            const ub = (1n << 63n) - 1n;
+            if (bi > ub || bi < lb) {
+                throw Error(`out of range [${lb}, ${ub}]`)
+            }
+            const doubleVal = Number(obj.Property);
+            if (Math.abs(doubleVal) >= (2 ** 53)) {
+                obj.Property = BigInt(obj.Property).toString();
+            } else {
+                obj.Property = Number(obj.Property);
+            }
+        } catch (e) {
+            throw Error(`${obj.Name} = ${obj.Property}: ${e.toString()}`)
+        }
         Object.assign(prop, obj);
         return prop;
     }

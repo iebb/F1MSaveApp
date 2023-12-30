@@ -31,6 +31,7 @@ export class BoolProperty extends Property {
     }
     static from(obj) {
         let prop = new BoolProperty();
+        obj.Property = !!obj.Property;
         Object.assign(prop, obj);
         return prop;
     }

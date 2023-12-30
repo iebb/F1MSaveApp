@@ -33,6 +33,12 @@ export class Int8Property extends Property {
     }
     static from(obj) {
         let prop = new Int8Property();
+        obj.Property = obj.Property || 0;
+        const lb = -128;
+        const ub = 127;
+        if (obj.Property > ub || obj.Property < lb) {
+            throw Error(`${obj.Name} = ${obj.Property} out of range [${lb}, ${ub}]`)
+        }
         Object.assign(prop, obj);
         return prop;
     }

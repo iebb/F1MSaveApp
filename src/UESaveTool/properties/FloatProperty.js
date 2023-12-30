@@ -33,6 +33,7 @@ export class FloatProperty extends Property {
     }
     static from(obj) {
         let prop = new FloatProperty();
+        obj.Property = Number(obj.Property);
         Object.assign(prop, obj);
         return prop;
     }

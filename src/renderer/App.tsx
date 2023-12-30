@@ -79,7 +79,7 @@ function MainApp() {
                       window.electron.ipcRenderer.sendMessage('request-file', f.file); // request file
                     }}
                   >
-                    <div>
+                    <div className={`${meta.ScenarioType ? 'scenario-text' : ''}`}>
                       <img width='18' alt='icon' src={logoMapping[f.version]} style={{ marginRight: 10 }} />
                       {f.filename}
                       <div style={{ float: 'right', marginRight: -8, display: 'flex', flexDirection: 'row' }}>
@@ -89,11 +89,14 @@ function MainApp() {
                     <div className='team-logo-flex'>
                       <img width='24' alt='platform' src={TeamLogos[meta.TeamID]} />
                       <div className='team-logo-flex-date dateinfo'>
-                        <span className={`${meta.RaceWeekendInProgress ? 'race-week-text' : ''}`}>{
+                        <span className={`${meta.RaceWeekendInProgress ? 'race-week-text' : ''} ${meta.ScenarioType ? 'scenario-text' : ''}`}>{
                           (new Date(
                             (meta.Day - 2) * 86400000 - 2208988800000
-                          )).toLocaleDateString('en-ZA', { dateStyle: 'short' }).substring(2)
-                        }, {meta.RaceWeekendInProgress ? `${meta.WeekendStage ? WeekendStagesAbbrev[meta.WeekendStage!] : 'Weekend'}` : meta.CurrentRace ? `Round ${meta.CurrentRace}` : 'End of Season'}</span>
+                          )).toLocaleDateString('en-ZA', { dateStyle: 'short' })
+                        }, {
+                          meta.ScenarioType ? "Scenario" :
+                            meta.RaceWeekendInProgress ? `${meta.WeekendStage ? WeekendStagesAbbrev[meta.WeekendStage!] : 'Weekend'}` : meta.CurrentRace ? `Round ${meta.CurrentRace}` : 'End of Season'
+                        }</span>
                         <br />
                         {
                           (new Date(f.mtime)).toLocaleTimeString('en-US', { month: 'short', day: 'numeric' })

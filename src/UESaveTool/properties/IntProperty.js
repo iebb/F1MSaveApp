@@ -33,6 +33,12 @@ export class IntProperty extends Property {
     }
     static from(obj) {
         let prop = new IntProperty();
+        obj.Property = obj.Property || 0;
+        const lb = -1 << 31;
+        const ub = 0x7fffffff;
+        if (obj.Property > ub || obj.Property < lb) {
+            throw Error(`${obj.Name} = ${obj.Property} out of range [${lb}, ${ub}]`)
+        }
         Object.assign(prop, obj);
         return prop;
     }
