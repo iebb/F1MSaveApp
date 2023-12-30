@@ -159,13 +159,7 @@ const listFiles = () => {
         });
       }
     });
-  return fileList.map(f => {
-    let reader = fs.readFileSync(f.file);
-    const serial = new Serializer(reader);
-    const gvasMeta = new Gvas().deserialize(serial);
-    const meta = parseGvasProps(gvasMeta.Properties);
-    return {...f, ...meta}
-  }).sort((x: SaveFile, y: SaveFile) => y.mtime - x.mtime);
+  return fileList;
 };
 const listFilesLinux = () => {
   const fileList: SaveFile[] = [];
@@ -202,15 +196,24 @@ const listFilesLinux = () => {
       });
     }
   });
-  return fileList.sort((x: SaveFile, y: SaveFile) => y.mtime - x.mtime);
+  return fileList;
 };
 
 ipcMain.on('loaded', async (event) => {
+  let files = [];
   if (process.platform === 'win32') {
-    event.reply('file-list', listFiles());
+    files = listFiles();
   } else if (process.platform === 'linux') {
-    event.reply('file-list', listFilesLinux());
+    files = listFilesLinux();
   }
+  files = files.map(f => {
+    let reader = fs.readFileSync(f.file);
+    const serial = new Serializer(reader);
+    const gvasMeta = new Gvas().deserialize(serial);
+    const meta = parseGvasProps(gvasMeta.Properties);
+    return {...f, ...meta}
+  }).sort((x: SaveFile, y: SaveFile) => y.mtime - x.mtime)
+  event.reply('file-list', files);
 });
 
 ipcMain.on('request-file', async (event, filename) => {
@@ -220,12 +223,41 @@ ipcMain.on('request-file', async (event, filename) => {
       file: buffer,
       filename: path.basename(filename),
       path: filename,
+      haveBackup: fs.existsSync(`${filename}.bak`),
     });
   });
 });
 // eslint-disable-next-line @typescript-eslint/no-shadow
-ipcMain.on('save-file', async (event, { data, path }) => {
-  fs.renameSync(path, `${path}.bak`);
-  fs.writeFileSync(path, data);
+ipcMain.on('save-file', async (event, { data, path: filename }) => {
+  if (!fs.existsSync(`${filename}.bak`)) {
+    fs.renameSync(filename, `${filename}.bak`);
+  }
+  fs.writeFileSync(filename, data);
   event.reply('file-list', listFiles());
+  console.log("reading file", filename);
+  fs.readFile(filename, (err, buffer) => {
+    event.reply('open-file', {
+      file: buffer,
+      filename: path.basename(filename),
+      path: filename,
+      haveBackup: fs.existsSync(`${filename}.bak`),
+    });
+  });
+});
+
+ipcMain.on('load-backup-file', async (event, { data, path: filename }) => {
+  if (fs.existsSync(`${filename}.bak`)) {
+    console.log("load-backup-file");
+    fs.renameSync(`${filename}.bak`, filename);
+
+    fs.readFile(filename, (err, buffer) => {
+      event.reply('file-list', listFiles());
+      event.reply('open-file', {
+        file: buffer,
+        filename: path.basename(filename),
+        path: filename,
+        haveBackup: false,
+      });
+    });
+  }
 });

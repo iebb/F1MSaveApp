@@ -37,11 +37,20 @@ function MainApp() {
       alert("Savefile Updated!")
     }, false)
 
+    window.document.addEventListener('load-backup-file', (e: Event) => {
+      window.electron.ipcRenderer.sendMessage('load-backup-file', {
+        path: (e as CustomEvent).detail.filepath,
+      });
+      alert("Restored from Backup")
+    }, false)
+
     window.electron.ipcRenderer.on('open-file', (arg: any) => {
       ref.current?.contentDocument?.dispatchEvent( new CustomEvent('loadFile', {
         detail: {
           file: new File([arg.file], arg.filename),
-          path: arg.path
+          filename: arg.filename,
+          path: arg.path,
+          haveBackup: arg.haveBackup,
         }
       }))
     });
