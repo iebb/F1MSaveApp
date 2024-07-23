@@ -9,6 +9,7 @@ import Haas from '../../assets/game_icons/Haas.svg';
 import Mercedes from '../../assets/game_icons/Mercedes.svg';
 import Redbull from '../../assets/game_icons/Redbull.svg';
 import Williams from '../../assets/game_icons/Williams.svg';
+import Custom from '../../assets/game_icons/Custom.svg';
 
 export const TeamLogos: any = {
   1: Ferrari,
@@ -21,6 +22,7 @@ export const TeamLogos: any = {
   8: AlphaTauri,
   9: AlfaRomeo,
   10: AstonMartin,
+  32: Custom,
 }
 
 export const WeekendStagesAbbrev = [
