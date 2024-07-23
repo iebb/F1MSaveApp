@@ -123,7 +123,22 @@ const listFilesLinux = () => {
   const steamAppData = `${os.homedir()}/.local/share/Steam/steamapps/compatdata`;
   const compat22 = `${steamAppData}/1708520/pfx/drive_c/users/steamuser/AppData/Local/F1Manager22`;
   const compat23 = `${steamAppData}/2287220/pfx/drive_c/users/steamuser/AppData/Local/F1Manager23`;
+  const compat24 = `${steamAppData}/2591280/pfx/drive_c/users/steamuser/AppData/Local/F1Manager24`;
 
+  glob.sync(`${compat24}/Saved/SaveGames/*.sav`).forEach((file: string) => {
+    const fst = fs.statSync(file);
+    const basename = path.basename(file);
+    if (/^save\d+\.sav$/.test(basename) || basename === 'autosave.sav') {
+      fileList.push({
+        file,
+        filename: basename,
+        size: fst.size,
+        mtime: fst.mtimeMs,
+        version: 4,
+        platform: 'Steam',
+      });
+    }
+  });
   glob.sync(`${compat23}/Saved/SaveGames/*.sav`).forEach((file: string) => {
     const fst = fs.statSync(file);
     const basename = path.basename(file);
@@ -159,6 +174,23 @@ const listFilesWindows = () => {
   const fileList: SaveFile[] = listXboxFiles(
     'FrontierDevelopmentsPlc.21035A543665E_ft442cafaz8hg',
   );
+
+  glob
+    .sync(`${process.env.LOCALAPPDATA}\\F1Manager24\\Saved\\SaveGames\\*.sav`)
+    .forEach((file: string) => {
+      const fst = fs.statSync(file);
+      const basename = path.basename(file);
+      if (/^save\d+\.sav$/.test(basename) || basename === 'autosave.sav') {
+        fileList.push({
+          file,
+          filename: basename,
+          size: fst.size,
+          mtime: fst.mtimeMs,
+          version: 4,
+          platform: 'Steam',
+        });
+      }
+    });
 
   glob
     .sync(`${process.env.LOCALAPPDATA}\\F1Manager23\\Saved\\SaveGames\\*.sav`)
@@ -197,7 +229,7 @@ const listFilesWindows = () => {
 };
 
 const listFiles = () => {
-  let files = [];
+  let files: any[] = [];
   if (process.platform === 'win32') {
     files = listFilesWindows();
   } else if (process.platform === 'linux') {
@@ -228,6 +260,7 @@ ipcMain.on('request-file', async (event, filename) => {
     });
   });
 });
+
 // eslint-disable-next-line @typescript-eslint/no-shadow
 ipcMain.on('save-file', async (event, { data, path: filename }) => {
   if (!fs.existsSync(`${filename}.bak`)) {

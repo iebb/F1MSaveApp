@@ -19,4 +19,6 @@ export interface Metadata {
   WeekendStage?: number;
   CurrentRace?: number;
   RaceWeekendInProgress?: boolean;
+
+  ScenarioType?: number;
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
 import logo_22 from '../../assets/logos/logo_22.jpg';
 import logo_23 from '../../assets/logos/logo_23.jpg';
+import logo_24 from '../../assets/logos/logo_24.jpg';
 import Steam from '../../assets/logos/steam.svg';
 import Xbox from '../../assets/logos/xbox.svg';
 import './App.css';
@@ -9,6 +10,7 @@ import { SaveFile } from '../types/types';
 import { TeamLogos, WeekendStagesAbbrev } from './constants';
 
 const logoMapping: any = {
+  4: logo_24,
   3: logo_23,
   2: logo_22,
   Steam: Steam,
