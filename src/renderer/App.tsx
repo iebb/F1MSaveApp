@@ -98,7 +98,15 @@ function MainApp() {
                       </div>
                     </div>
                     <div className='team-logo-flex'>
-                      <img width='24' alt='platform' src={TeamLogos[meta.TeamID]} />
+                      <div style={{ width: 32 }}>
+                        {
+                          meta.CustomTeamLogoBase64 ? (
+                            <img width='24' height='24' style={{ margin: 4 }} alt='platform' src={`data:image/png;base64,${meta.CustomTeamLogoBase64}`} />
+                          ) : (
+                            <img width='32' height='32' alt='platform' src={TeamLogos[meta.TeamID]} />
+                          )
+                        }
+                      </div>
                       <div className='team-logo-flex-date dateinfo'>
                         <span className={`${meta.RaceWeekendInProgress ? 'race-week-text' : ''} ${meta.ScenarioType ? 'scenario-text' : ''}`}>{
                           (new Date(

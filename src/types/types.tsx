@@ -16,6 +16,8 @@ export interface Metadata {
   FirstName: string;
   LastName: string;
 
+  CustomTeamLogoBase64?: string;
+
   WeekendStage?: number;
   CurrentRace?: number;
   RaceWeekendInProgress?: boolean;
